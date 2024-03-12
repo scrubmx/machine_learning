@@ -1,9 +1,20 @@
 defmodule ML.FizzBuzz do
-  @moduledoc false
+  @moduledoc ~S"""
+  Documentation for `ML.FizzBuzz`.
+  """
 
   @learning_rate 0.01
 
-  def classify(number) do
+  @doc ~S"""
+  Classify the given number into :fizz or :buzz.
+
+  ### Error cases
+
+      iex> ML.FizzBuzz.classify("hello")
+      ** (ArgumentError) argument must be an integer, got: "hello"
+
+  """
+  def classify(number) when is_integer(number) do
     # TODO: The weights should be randomly generated
     weights = [
       [0.2, 0.3],
@@ -16,6 +27,8 @@ defmodule ML.FizzBuzz do
 
     neural_network(vector, weights, label_vector)
   end
+
+  def classify(number), do: raise(ArgumentError, message: "argument must be an integer, got: #{inspect(number)}")
 
   @doc ~S"""
   This function will take a vector and a matrix of weights and return
@@ -54,12 +67,14 @@ defmodule ML.FizzBuzz do
 
   ## Examples
 
-    iex> ML.FizzBuzz.mods(3)
-    [0, 3]
-    iex> ML.FizzBuzz.mods(5)
-    [2, 0]
-    iex> ML.FizzBuzz.mods(15)
-    [0, 0]
+      iex> ML.FizzBuzz.mods(3)
+      [0, 3]
+
+      iex> ML.FizzBuzz.mods(5)
+      [2, 0]
+
+      iex> ML.FizzBuzz.mods(15)
+      [0, 0]
   """
   def mods(x) do
     [rem(x, 3), rem(x, 5)]
@@ -82,10 +97,10 @@ defmodule ML.FizzBuzz do
 
   ## Examples
 
-    iex> probabilities = ML.FizzBuzz.softmax([0.75, 0.25, 0.25])
-    [0.6, 0.2, 0.2]
-    iex> Enum.sum(probabilities) == 1
-    true
+      iex> probabilities = ML.FizzBuzz.softmax([0.75, 0.25, 0.25])
+      [0.6, 0.2, 0.2]
+      iex> Enum.sum(probabilities) == 1
+      true
   """
   def softmax(vector) do
     sum = Enum.sum(vector)
@@ -102,11 +117,11 @@ defmodule ML.FizzBuzz do
 
   ## Examples
 
-    iex> ML.FizzBuzz.relu(0.42)
-    0.42
+      iex> ML.FizzBuzz.relu(0.42)
+      0.42
 
-    iex> ML.FizzBuzz.relu(-0.25)
-    0
+      iex> ML.FizzBuzz.relu(-0.25)
+      0
 
   ## References
 
@@ -135,15 +150,15 @@ defmodule ML.FizzBuzz do
   In mathematics, the dot product is an algebraic operation that takes two equal-length
   sequences of numbers (usually coordinate vectors), and returns a single number.
 
-  ## Definition
+  The dot product of two vectors:
 
-    The dot product of two vectors
-    $${\displaystyle \mathbf {a} =[a_{1},a_{2},\cdots ,a_{n}]} and {\displaystyle \mathbf {b} =[b_{1},b_{2},\cdots ,b_{n}]}$$,
-    specified with respect to an orthonormal basis, is defined as:
+    $${\displaystyle \mathbf {a} =[a_{1},a_{2},\cdots ,a_{n}]} \text{ and } {\displaystyle \mathbf {b} =[b_{1},b_{2},\cdots ,b_{n}]}$$
 
-      $${\displaystyle \mathbf {a} \cdot \mathbf {b} =\sum _{i=1}^{n}a_{i}b_{i}=a_{1}b_{1}+a_{2}b_{2}+\cdots +a_{n}b_{n}}$$
+  Is specified with respect to an orthonormal basis, is defined as:
 
-    Where ${\displaystyle \Sigma}$ denotes summation and ${\displaystyle n}$ is the dimension of the vector space.
+    $${\displaystyle \mathbf {a} \cdot \mathbf {b} =\sum _{i=1}^{n}a_{i}b_{i}=a_{1}b_{1}+a_{2}b_{2}+\cdots +a_{n}b_{n}}$$
+
+  Where ${\displaystyle \Sigma}$ denotes summation and ${\displaystyle n}$ is the dimension of the vector space.
 
   ## References
 
@@ -151,9 +166,9 @@ defmodule ML.FizzBuzz do
 
   ### Alternative Implementation
 
-    vector
-    |> Enum.with_index()
-    |> Enum.reduce(0, fn {row, i}, acc -> acc + row * Enum.at(weights, i) end)
+      vector
+      |> Enum.with_index()
+      |> Enum.reduce(0, fn {row, i}, acc -> acc + row * Enum.at(weights, i) end)
 
   """
   def dot_product(vector, weights) do

@@ -1,13 +1,18 @@
 defmodule ML.MixProject do
   use Mix.Project
 
+  @version "0.1.0"
+
   def project do
     [
       app: :m_l,
-      version: "0.1.0",
+      name: "Machine Learning",
+      version: @version,
       elixir: "~> 1.16",
+      elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      docs: docs(),
     ]
   end
 
@@ -18,11 +23,43 @@ defmodule ML.MixProject do
     ]
   end
 
+  # Specifies which paths to compile per environment.
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
+
+
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
+      {:ex_doc, "~> 0.31", only: :dev, runtime: false}
+    ]
+  end
+
+  # Run "mix help docs" to learn about documentation.
+  defp docs do
+    [
+      main: "README",
+      source_ref: "v#{@version}",
+      logo: nil,
+      source_url: "https://github.com/scrubmx/machine_learning",
+      extras: [
+        "README.md",
+        "notebooks/livebooks.md",
+        "notebooks/classification/fizz_buzz.livemd"
+      ],
+      groups_for_extras: [
+        Classification: Path.wildcard("/classification/*.livemd")
+      ],
+      groups_for_modules: [
+        Main: [
+          ML
+        ],
+        Classification: [
+          ML.FizzBuzz
+        ]
+      ],
+      before_closing_head_tag: {Docs, :before_closing_head_tag, []},
+      before_closing_body_tag: {Docs, :before_closing_body_tag, []}
     ]
   end
 end

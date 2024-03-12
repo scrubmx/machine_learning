@@ -1,0 +1,41 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# FizzBuzz
+
+## Description
+
+FizzBuzz requires to print the correct string for a given number with the following rules:
+
+1. If the number is divisible by 3 print "Fizz" instead of the number
+2. If the number is divisible by 5 print "Buzz" instead of the number
+3. If the number is divisible by both 3 and 5 print "FizzBuzz"
+
+```elixir
+defmodule FizzBuzz do
+  def classify(number) do
+    div_by_3 = rem(number, 3) == 0
+    div_by_5 = rem(number, 5) == 0
+
+    cond do
+      div_by_3 && div_by_5 -> "FizzBuzz"
+      div_by_3 -> "Fizz"
+      div_by_5 -> "Buzz"
+      true -> "Neiter"
+    end
+  end
+end
+
+FizzBuzz.classify(3) |> IO.puts()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Fizz
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```

@@ -1,21 +1,27 @@
-# Ml
+# Machine Learning (ML)
 
-**TODO: Add description**
+This is a library of deep learning and predictive analytics witten from scratch in Elixir.
+
+```mermaid
+graph LR;
+  AI[Artificial Intelligence]-->ML[Machine Learning];
+  ML-->DL[Deep Learning];
+  ML-->PA[Predictive Analytics];
+```
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `ml` to your list of dependencies in `mix.exs`:
+Given this is project was created for educational purposes it's not on available in [Hex](https://hex.pm).
+However, if you want, the package can be installed by adding `m_l` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:ml, "~> 0.1.0"}
+    {:m_l, git: "https://github.com/scrubmx/machine_learning.git", tag: "0.1.0"}
   ]
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/ml>.
+## Guides
 
+* [ML Guides](livebooks.html)
