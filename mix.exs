@@ -45,7 +45,7 @@ defmodule ML.MixProject do
       extras: [
         "README.md",
         "notebooks/livebooks.md",
-        "notebooks/classification/fizz_buzz.livemd"
+        "notebooks/classifiers/fizz_buzz.livemd"
       ],
       groups_for_extras: [
         Classification: Path.wildcard("/classification/*.livemd")
@@ -54,8 +54,11 @@ defmodule ML.MixProject do
         Main: [
           ML
         ],
-        Classification: [
-          ML.FizzBuzz
+        Activations: [
+          ML.Activations
+        ],
+        Classifiers: [
+          ML.Classifiers.FizzBuzz
         ]
       ],
       before_closing_head_tag: {Docs, :before_closing_head_tag, []},

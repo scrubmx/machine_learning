@@ -4,4 +4,4 @@ The guides are a collection of [Livebooks](https://livebook.dev) designed to hel
 
 ## Classification
 
-* [FizzBuzz](notebooks/classification/fizz_buzz.livemd)
+* [FizzBuzz](notebooks/classifiers/fizz_buzz.livemd)

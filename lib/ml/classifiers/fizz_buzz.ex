@@ -1,16 +1,16 @@
-defmodule ML.FizzBuzz do
+defmodule ML.Classifiers.FizzBuzz do
   @moduledoc ~S"""
-  Documentation for `ML.FizzBuzz`.
+  Documentation for `ML.Classifiers.FizzBuzz`.
   """
 
-  @learning_rate 0.01
+  import ML.Activations, only: [relu: 1, softmax: 1]
 
   @doc ~S"""
   Classify the given number into :fizz or :buzz.
 
   ### Error cases
 
-      iex> ML.FizzBuzz.classify("hello")
+      iex> ML.Classifiers.FizzBuzz.classify("hello")
       ** (ArgumentError) argument must be an integer, got: "hello"
 
   """
@@ -57,7 +57,7 @@ defmodule ML.FizzBuzz do
     gradient_descent(vector, weights, label_vector, current_loss)
   end
 
-  def gradient_descent(vector, weights, label_vector, current_loss) do
+  def gradient_descent(_vector, _weights, _label_vector, _current_loss) do
     # TODO: Implement the gradient descent algorithm
   end
 
@@ -67,70 +67,19 @@ defmodule ML.FizzBuzz do
 
   ## Examples
 
-      iex> ML.FizzBuzz.mods(3)
+      iex> ML.Classifiers.FizzBuzz.mods(3)
       [0, 3]
 
-      iex> ML.FizzBuzz.mods(5)
+      iex> ML.Classifiers.FizzBuzz.mods(5)
       [2, 0]
 
-      iex> ML.FizzBuzz.mods(15)
+      iex> ML.Classifiers.FizzBuzz.mods(15)
       [0, 0]
   """
   def mods(x) do
     [rem(x, 3), rem(x, 5)]
   end
 
-  @doc ~S"""
-  The **softmax function** takes as input a vector z of K real numbers, and normalizes it
-  into a [probability distribution](https://en.wikipedia.org/wiki/Probability_distribution)
-  consisting of K probabilities proportional to the exponentials of the input numbers.
-
-  That is, prior to applying softmax, some vector components could be negative, or greater
-  than one; and might not sum to 1; but after applying softmax, each component will be in the
-  interval ${\displaystyle (0,1)$}, and the components will add up to 1, so that they can be
-  interpreted as probabilities.
-
-  For a vector ${\displaystyle z}$ of ${\displaystyle K}$ real numbers, the standard (unit) softmax function
-  ${\displaystyle \sigma :\mathbb {R} ^{K}\mapsto (0,1)^{K}}$, where ${\displaystyle K\geq 1}$, is defined by the formula:
-
-    $${\displaystyle \sigma (\mathbf {z} )_{i}={\frac {e^{z_{i}}}{\sum _{j=1}^{K}e^{z_{j}}}}\ \ {\text{ for }}i=1,\dotsc ,K{\text{ and }}\mathbf {z} =(z_{1},\dotsc ,z_{K})\in \mathbb {R} ^{K}.}$$
-
-  ## Examples
-
-      iex> probabilities = ML.FizzBuzz.softmax([0.75, 0.25, 0.25])
-      [0.6, 0.2, 0.2]
-      iex> Enum.sum(probabilities) == 1
-      true
-  """
-  def softmax(vector) do
-    sum = Enum.sum(vector)
-    Enum.map(vector, fn x -> x / sum end)
-  end
-
-  @doc ~S"""
-  Rectified Linear Unit (ReLU).
-  Is an activation function defined as the positive part of its argument:
-
-    $$f(x) = x^{+} = \max(0,x) = \frac{x + \left| x \right|}{2} = \left\{\begin{matrix} x & if x > 0, \\0 & otherwise. \end{matrix}\right.$$
-
-  Where $x$ is the input to a neuron. This is also known as a ramp function.
-
-  ## Examples
-
-      iex> ML.FizzBuzz.relu(0.42)
-      0.42
-
-      iex> ML.FizzBuzz.relu(-0.25)
-      0
-
-  ## References
-
-    * [Rectified Linear Unit on Wikipedia](https://en.wikipedia.org/wiki/Rectified_linear_unit)
-    * [Activation Functions on Wikipedia](https://en.wikipedia.org/wiki/Activation_function)
-  """
-  def relu(x) do
-    if x > 0, do: x, else: 0
-  end
 
   def loss(predictions, label_vector) do
     Enum.zip(predictions, label_vector)

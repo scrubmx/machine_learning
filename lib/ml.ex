@@ -16,6 +16,6 @@ defmodule ML do
     :buzz
   """
   def fizz_buzz(number) do
-    ML.FizzBuzz.classify(number)
+    ML.Classifiers.FizzBuzz.classify(number)
   end
 end
