@@ -1,6 +1,6 @@
 # Machine Learning (ML)
 
-This is a library of deep learning and predictive analytics witten from scratch in Elixir.
+This is a library of deep learning and predictive analytics written from scratch in Elixir.
 
 ```mermaid
 graph LR;
