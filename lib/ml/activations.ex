@@ -53,7 +53,6 @@ defmodule ML.Activations do
     Enum.map(vector, fn x -> x / sum end)
   end
 
-
   @doc ~S"""
   Rectified Linear Unit (ReLU).
   Is an activation function defined as the positive part of its argument:

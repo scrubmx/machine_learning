@@ -80,7 +80,6 @@ defmodule ML.Classifiers.FizzBuzz do
     [rem(x, 3), rem(x, 5)]
   end
 
-
   def loss(predictions, label_vector) do
     Enum.zip(predictions, label_vector)
     |> Enum.map(fn {prediction, label_value} -> (prediction - label_value) ** 2 end)
@@ -126,7 +125,46 @@ defmodule ML.Classifiers.FizzBuzz do
     |> Enum.sum()
   end
 
-  defp one_hot_encode(number) do
+  @doc ~S"""
+  One hot encoding is a technique that we use to represent categorical variables as numerical values in a machine learning model.
+
+  ## References
+
+  [One-hot on Wikipedia](https://en.wikipedia.org/wiki/One-hot#Machine_learning_and_statistics)
+
+  ## Example
+
+  Consider the data where fruits, their corresponding categorical values, and prices are given:
+
+    |  Fruit | Categorical value | Price |
+    |:------:|:-----------------:|:-----:|
+    |  Apple |         1         |   10  |
+    |  Mango |         2         |   15  |
+    | Orange |         3         |   20  |
+
+  The output after applying one-hot encoding on the data is given as follows,
+
+    | Apple | Mango | Orange | Price |
+    |:-----:|:-----:|:------:|-------|
+    |   1   |   0   |    0   |   10  |
+    |   0   |   1   |    0   |   15  |
+    |   0   |   0   |    1   |   20  |
+
+  ### The advantages of using one hot encoding include:
+
+  1. It allows the use of categorical variables in models that require numerical input.
+  2. It can improve model performance by providing more information to the model about the categorical variable.
+  3. It can help to avoid the problem of ordinality, which can occur when a categorical variable has a natural ordering (e.g. small, medium, large).
+
+  ### The disadvantages of using one hot encoding include:
+
+  1. It can lead to increased dimensionality, as a separate column is created for each category in the variable. This can make the model more complex and slow to train.
+  2. It can lead to sparse data, as most observations will have a value of 0 in most of the one-hot encoded columns.
+  3. It can lead to overfitting, especially if there are many categories in the variable and the sample size is relatively small.
+  4. One-hot-encoding is a powerful technique to treat categorical data, but it can lead to increased dimensionality, sparsity, and overfitting. It is important to use it cautiously and consider other methods such as ordinal encoding or binary encoding.
+
+  """
+  def one_hot_encode(number) do
     cond do
       rem(number, 3) == 0 -> [1, 0]
       rem(number, 5) == 0 -> [0, 1]
