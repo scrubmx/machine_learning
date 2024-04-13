@@ -5,6 +5,8 @@ defmodule ML.Classifiers.FizzBuzz do
 
   import ML.Activations, only: [relu: 1, softmax: 1]
 
+  @learning_rate 0.01
+
   @doc ~S"""
   Classify the given number into :fizz or :buzz.
 
@@ -36,29 +38,52 @@ defmodule ML.Classifiers.FizzBuzz do
   weights until we find the weights that minimize the loss value.
   """
   def neural_network(vector, weights, label_vector, epsilon \\ 0.001) do
-    probabilities =
+    predictions =
       vector_matrix_multiplication(vector, weights)
       |> softmax()
       |> Enum.map(&relu/1)
 
-    current_loss = loss(probabilities, label_vector)
+    current_loss = loss(predictions, label_vector)
 
     if current_loss <= epsilon do
-      IO.puts("Loss: #{current_loss}")
-      IO.inspect(probabilities, label: "Probabilities", pretty: true)
-      current_loss
+      # IO.puts("Loss: #{current_loss}")
+      # IO.inspect(predictions, label: "predictions", pretty: true)
+      # IO.inspect(weights, label: "weights", pretty: true)
+      decode_prediction(predictions)
     else
-      updated_weights = update_weights(vector, weights, label_vector, current_loss)
+      # IO.puts("Loss: #{current_loss}")
+      updated_weights = update_weights(vector, weights, label_vector, predictions)
       neural_network(vector, updated_weights, label_vector)
     end
   end
 
-  def update_weights(vector, weights, label_vector, current_loss) do
-    gradient_descent(vector, weights, label_vector, current_loss)
+  def update_weights(vector, weights, label_vector, predictions) do
+    # Calculate gradients matrix
+    gradients =
+      Enum.with_index(predictions)
+      |> Enum.map(fn {pred, index} ->
+        # Calculate gradient for each weight
+        # Note: This is a simplified gradient calculation for demonstration.
+        delta = 2 * (pred - Enum.at(label_vector, index))
+        Enum.map(vector, &(&1 * delta))
+      end)
+
+    # Adjust weights by subtracting gradient scaled by learning rate
+    new_weights =
+      Enum.zip(weights, gradients)
+      |> Enum.map(fn {weight_row, gradient_row} ->
+        Enum.zip(weight_row, gradient_row)
+        |> Enum.map(fn {w, g} -> w - @learning_rate * g end)
+      end)
+
+    new_weights
   end
 
-  def gradient_descent(_vector, _weights, _label_vector, _current_loss) do
-    # TODO: Implement the gradient descent algorithm
+  @doc ~S"""
+  A gradient is a vector of partial derivatives.
+  It points in the direction of the greatest rate of increase of the function.
+  """
+  def calculate_gradient(vector, weights, label_vector) do
   end
 
   @doc ~S"""
@@ -77,13 +102,22 @@ defmodule ML.Classifiers.FizzBuzz do
       [0, 0]
   """
   def mods(x) do
-    [rem(x, 3), rem(x, 5)]
+    if (rem(x, 15) == 0) do
+      [0, 3] # Temporary hack to stop the neural network from breaking for "FizzBuzz"
+    else
+      [rem(x, 3), rem(x, 5)]
+    end
   end
 
   def loss(predictions, label_vector) do
     Enum.zip(predictions, label_vector)
     |> Enum.map(fn {prediction, label_value} -> (prediction - label_value) ** 2 end)
     |> Enum.sum()
+  end
+
+  def loss_derivative(predictions, label_vector) do
+    Enum.zip(predictions, label_vector)
+    |> Enum.map(fn {prediction, label_value} -> 2 * (prediction - label_value) end)
   end
 
   @doc ~S"""
@@ -169,6 +203,15 @@ defmodule ML.Classifiers.FizzBuzz do
       rem(number, 3) == 0 -> [1, 0]
       rem(number, 5) == 0 -> [0, 1]
       true -> [0, 0]
+    end
+  end
+
+  def decode_prediction(predictions) do
+    [fizz_prediction, buzz_prediction] = predictions # Example: [0.97234343, 0.024545]
+    cond do
+      fizz_prediction > buzz_prediction -> "Fizz"
+      fizz_prediction < buzz_prediction -> "Buzz"
+      true -> "Neither"
     end
   end
 end
