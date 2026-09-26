@@ -1,19 +1,22 @@
 defmodule ML do
   @moduledoc """
-  Documentation for `ML`.
+  Entry points for the machine learning examples.
   """
 
   @doc """
-  Fizz Buzz classification.
-  The main entry point for the FizzBuzz classifier.
-  Current  implementation only returns Fizz or Buzz.
+  Classifies an integer with the trained FizzBuzz network.
+
+  Returns `"None"`, `"Fizz"`, `"Buzz"`, or `"FizzBuzz"`. See
+  `ML.Classifiers.FizzBuzz` for the training method.
 
   ## Examples
 
-    iex> ML.fizz_buzz(3)
-    :fizz
-    iex> ML.fizz_buzz(5)
-    :buzz
+      iex> ML.fizz_buzz(3)
+      "Fizz"
+      iex> ML.fizz_buzz(5)
+      "Buzz"
+      iex> ML.fizz_buzz(15)
+      "FizzBuzz"
   """
   def fizz_buzz(number) do
     ML.Classifiers.FizzBuzz.classify(number)
