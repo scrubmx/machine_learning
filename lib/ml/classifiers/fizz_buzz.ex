@@ -9,18 +9,18 @@ defmodule ML.Classifiers.FizzBuzz do
 
   `classify/1` starts with zero weights and trains on one example of each class
   (1, 3, 5, and 15). Each training step converts the number to features,
-  predicts probabilities, calculates a gradient, and updates the weights. The
-  loss for an example is the negative logarithm of its correct-class
-  probability. `loss/2` makes this value available for inspection. The
-  gradient for each weight is `(predicted_probability - target) * input`; this
-  is the derivative of softmax cross entropy with a one-hot target. Stochastic
-  gradient descent subtracts the gradient times the learning rate. After the
-  fixed number of epochs, the network predicts the requested number. The
-  requested number is never used as a training label.
+  predicts probabilities, calculates a gradient, and updates the weights.
+  The loss for an example is the negative logarithm of its correct-class
+  probability. `loss/2` makes this value available for inspection.
+  The gradient for each weight is `(predicted_probability - target) * input`.
+  This is the derivative of softmax cross entropy with a one-hot target.
+  Stochastic gradient descent subtracts the gradient times the learning rate.
+  After the fixed number of epochs, the network predicts the requested number.
+  The requested number is never used as a training label.
 
   Training is intentionally repeated on every call so the function has no
   hidden state and gives the same result for the same input. This is a teaching
-  example; the divisibility features already capture the FizzBuzz rule.
+  example. The divisibility features already capture the FizzBuzz rule.
   """
 
   alias ML.Activations
