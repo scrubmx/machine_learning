@@ -41,11 +41,18 @@ defmodule ML.Classifiers.FizzBuzzTest do
     assert Enum.any?(List.flatten(weights), &(&1 != 0.0))
     assert FizzBuzz.train() == weights
 
-    for {input, class} <- [{[1.0, 0.0, 0.0], 0}, {[1.0, 1.0, 0.0], 1}, {[1.0, 0.0, 1.0], 2}, {[1.0, 1.0, 1.0], 3}] do
-      scores = Enum.map(weights, fn row -> Enum.zip_with(row, input, &*/2) |> Enum.sum() end)
-      assert scores |> Enum.with_index() |> Enum.max_by(&elem(&1, 0)) |> elem(1) == class
-      assert scores |> ML.Activations.softmax() |> Enum.at(class) > 0.9
+    for {number, class} <- [{1, 0}, {3, 1}, {5, 2}, {15, 3}] do
+      predictions = FizzBuzz.predict_probabilities(number, weights)
+
+      assert predictions |> Enum.with_index() |> Enum.max_by(&elem(&1, 0)) |> elem(1) == class
+      assert Enum.at(predictions, class) > 0.9
+      assert FizzBuzz.loss(predictions, class) < FizzBuzz.loss([0.25, 0.25, 0.25, 0.25], class)
     end
+  end
+
+  test "loss/2 falls as the correct class gets more probability" do
+    assert FizzBuzz.loss([0.05, 0.9, 0.025, 0.025], 1) <
+             FizzBuzz.loss([0.25, 0.25, 0.25, 0.25], 1)
   end
 
   test "classify/1 rejects non-integers" do

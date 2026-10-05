@@ -35,6 +35,19 @@ updates them over 500 passes through those examples. This keeps the example
 deterministic and makes training observable through `train/0`; it also means
 every classification pays the cost of training.
 
+For each example, `train_example/2` computes output scores with a dot product,
+applies softmax to get probabilities, calculates gradients from the correct
+class, then subtracts a learning-rate-scaled gradient from each weight.
+`ML.Classifiers.FizzBuzz.loss/2` separately calculates cross-entropy loss from
+the probabilities and correct class index, so you can inspect how wrong a
+prediction is. The update uses its derivative directly.
+
+```elixir
+weights = ML.Classifiers.FizzBuzz.train()
+probabilities = ML.Classifiers.FizzBuzz.predict_probabilities(3, weights)
+ML.Classifiers.FizzBuzz.loss(probabilities, 1) # 1 is the "Fizz" class index
+```
+
 ## Guides
 
 TODO: Add links to the livebook notebooks.

@@ -8,11 +8,15 @@ defmodule ML.Classifiers.FizzBuzz do
   four output scores into probabilities.
 
   `classify/1` starts with zero weights and trains on one example of each class
-  (1, 3, 5, and 15). For each example, stochastic gradient descent subtracts
-  `learning_rate * (predicted_probability - target) * input` from each weight.
-  The target is a one-hot vector and this is the gradient of softmax cross
-  entropy. After the fixed number of epochs, the network predicts the requested
-  number. The requested number is never used as a training label.
+  (1, 3, 5, and 15). Each training step converts the number to features,
+  predicts probabilities, calculates a gradient, and updates the weights. The
+  loss for an example is the negative logarithm of its correct-class
+  probability. `loss/2` makes this value available for inspection. The
+  gradient for each weight is `(predicted_probability - target) * input`; this
+  is the derivative of softmax cross entropy with a one-hot target. Stochastic
+  gradient descent subtracts the gradient times the learning rate. After the
+  fixed number of epochs, the network predicts the requested number. The
+  requested number is never used as a training label.
 
   Training is intentionally repeated on every call so the function has no
   hidden state and gives the same result for the same input. This is a teaching
@@ -52,12 +56,8 @@ defmodule ML.Classifiers.FizzBuzz do
     weights = train()
 
     number
-    |> features()
-    |> probabilities(weights)
-    |> Enum.with_index()
-    |> Enum.max_by(&elem(&1, 0))
-    |> elem(1)
-    |> then(&Enum.at(@labels, &1))
+    |> predict_probabilities(weights)
+    |> decode_prediction()
   end
 
   def classify(number),
@@ -80,23 +80,77 @@ defmodule ML.Classifiers.FizzBuzz do
       true
   """
   def train do
-    initial_weights = for _ <- @labels, do: [0.0, 0.0, 0.0]
+    Enum.reduce(1..@epochs, initial_weights(), fn _, weights -> train_epoch(weights) end)
+  end
 
-    Enum.reduce(1..@epochs, initial_weights, fn _, weights ->
-      Enum.reduce(@training_examples, weights, fn {number, target}, current_weights ->
-        input = features(number)
-        predictions = probabilities(input, current_weights)
+  @doc """
+  Calculates cross-entropy loss for one prediction and its correct class.
 
-        current_weights
-        |> Enum.with_index()
-        |> Enum.map(fn {row, class} ->
-          error = Enum.at(predictions, class) - if(class == target, do: 1.0, else: 0.0)
+  `predictions` is the four probabilities in the order `"None"`, `"Fizz"`,
+  `"Buzz"`, `"FizzBuzz"`; `target` is the correct class index, from 0 to 3.
+  A smaller loss means the network assigned more probability to the correct
+  class. The training step uses the derivative of this loss directly, so it
+  does not need to calculate the scalar loss before updating weights.
 
-          Enum.zip_with(row, input, fn weight, feature ->
-            weight - @learning_rate * error * feature
-          end)
-        end)
-      end)
+  ## Examples
+
+      iex> ML.Classifiers.FizzBuzz.loss([0.25, 0.25, 0.25, 0.25], 1) |> Float.round(3)
+      1.386
+
+      iex> ML.Classifiers.FizzBuzz.loss([0.05, 0.9, 0.025, 0.025], 1) |> Float.round(3)
+      0.105
+  """
+  def loss(predictions, target), do: -:math.log(Enum.at(predictions, target))
+
+  @doc """
+  Returns the four class probabilities for a number using supplied weights.
+
+  The probabilities are ordered `"None"`, `"Fizz"`, `"Buzz"`, `"FizzBuzz"`.
+  Use the weights from `train/0` to inspect what the network learned.
+
+  ## Example
+
+      iex> probabilities = ML.Classifiers.FizzBuzz.predict_probabilities(3, ML.Classifiers.FizzBuzz.train())
+      iex> Enum.at(probabilities, 1) > 0.9
+      true
+  """
+  def predict_probabilities(number, weights) when is_integer(number) do
+    number |> features() |> forward_pass(weights)
+  end
+
+  defp initial_weights, do: for(_ <- @labels, do: [0.0, 0.0, 0.0])
+
+  defp train_epoch(weights), do: Enum.reduce(@training_examples, weights, &train_example/2)
+
+  defp train_example({number, target}, weights) do
+    input = features(number)
+    predictions = forward_pass(input, weights)
+    gradients = calculate_gradients(input, predictions, target)
+    update_weights(weights, gradients)
+  end
+
+  defp calculate_gradients(input, predictions, target) do
+    predictions
+    |> Enum.with_index()
+    |> Enum.map(fn {prediction, class} ->
+      gradient_for_class(input, prediction, class, target)
+    end)
+  end
+
+  defp gradient_for_class(input, prediction, class, target) do
+    error = prediction - one_hot_target(class, target)
+    Enum.map(input, &(&1 * error))
+  end
+
+  defp one_hot_target(class, target), do: if(class == target, do: 1.0, else: 0.0)
+
+  defp update_weights(weights, gradients) do
+    Enum.zip_with(weights, gradients, &update_row/2)
+  end
+
+  defp update_row(row, gradient_row) do
+    Enum.zip_with(row, gradient_row, fn weight, gradient ->
+      weight - @learning_rate * gradient
     end)
   end
 
@@ -121,9 +175,20 @@ defmodule ML.Classifiers.FizzBuzz do
     [1.0, if(mod_3 == 0, do: 1.0, else: 0.0), if(mod_5 == 0, do: 1.0, else: 0.0)]
   end
 
-  defp probabilities(input, weights) do
-    weights
-    |> Enum.map(fn row -> Enum.zip_with(row, input, &*/2) |> Enum.sum() end)
-    |> Activations.softmax()
+  defp forward_pass(input, weights) do
+    input |> output_scores(weights) |> Activations.softmax()
+  end
+
+  defp output_scores(input, weights), do: Enum.map(weights, &dot_product(input, &1))
+
+  defp dot_product(left, right), do: Enum.zip_with(left, right, &*/2) |> Enum.sum()
+
+  defp decode_prediction(predictions) do
+    Enum.at(@labels, most_likely_class(predictions))
+  end
+
+  defp most_likely_class(predictions) do
+    {_, class} = predictions |> Enum.with_index() |> Enum.max_by(&elem(&1, 0))
+    class
   end
 end

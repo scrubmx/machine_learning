@@ -3,6 +3,8 @@ defmodule ML do
   Entry points for the machine learning examples.
   """
 
+  alias ML.Classifiers.FizzBuzz
+
   @doc """
   Classifies an integer with the trained FizzBuzz network.
 
@@ -18,7 +20,5 @@ defmodule ML do
       iex> ML.fizz_buzz(15)
       "FizzBuzz"
   """
-  def fizz_buzz(number) do
-    ML.Classifiers.FizzBuzz.classify(number)
-  end
+  def fizz_buzz(number), do: FizzBuzz.classify(number)
 end
