@@ -10,12 +10,12 @@ defmodule ML.Activations do
   Activation functions output the "activation" or how active a given layer's
   neurons are in learning a representation of the data-generating distribution.
 
-  Some activations are commonly used as output activations. For example 
+  Some activations are commonly used as output activations. For example
   `softmax` is often used as the output in multiclass classification problems
   because it returns a categorical probability distribution:
 
-      iex> ML.Activations.softmax([1, 2, 3])
-      [0.16666666666666666, 0.3333333333333333, 0.5]
+      iex> ML.Activations.softmax([0, 0])
+      [0.5, 0.5]
 
   Other activations such as `sigmoid` are used because they have desirable
   properties, such as keeping the output tensor constrained within a range.
@@ -41,16 +41,21 @@ defmodule ML.Activations do
 
     $${\displaystyle \sigma (\mathbf {z} )_{i}={\frac {e^{z_{i}}}{\sum _{j=1}^{K}e^{z_{j}}}}\ \ {\text{ for }}i=1,\dotsc ,K{\text{ and }}\mathbf {z} =(z_{1},\dotsc ,z_{K})\in \mathbb {R} ^{K}.}$$
 
+  The largest input is subtracted before exponentiation to avoid overflow.
+
   ## Examples
 
-      iex> probabilities = ML.Activations.softmax([0.75, 0.25, 0.25])
-      [0.6, 0.2, 0.2]
-      iex> Enum.sum(probabilities) == 1
-      true
+      iex> ML.Activations.softmax([0, 0, 0])
+      [0.3333333333333333, 0.3333333333333333, 0.3333333333333333]
+
+      iex> ML.Activations.softmax([1000, 1000])
+      [0.5, 0.5]
   """
   def softmax(vector) do
-    sum = Enum.sum(vector)
-    Enum.map(vector, fn x -> x / sum end)
+    maximum = Enum.max(vector)
+    exponentials = Enum.map(vector, fn x -> :math.exp(x - maximum) end)
+    total = Enum.sum(exponentials)
+    Enum.map(exponentials, &(&1 / total))
   end
 
   @doc ~S"""

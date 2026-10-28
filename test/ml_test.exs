@@ -1,17 +1,20 @@
 defmodule MLTest do
   use ExUnit.Case, async: true
 
-  # doctest ML
+  doctest ML
 
   describe "fizz_buzz" do
-    @tag :skip
-    test "predicts :fizz for numbers that are divisible by 3" do
-      assert ML.fizz_buzz(3) == :fizz
+    test "predicts Fizz for numbers divisible by 3" do
+      assert ML.fizz_buzz(3) == "Fizz"
     end
 
-    @tag :skip
-    test "predicts :buzz for numbers that are divisible by 5" do
-      assert ML.fizz_buzz(5) == :buzz
+    test "predicts Buzz for numbers divisible by 5" do
+      assert ML.fizz_buzz(5) == "Buzz"
+    end
+
+    test "predicts FizzBuzz and None" do
+      assert ML.fizz_buzz(15) == "FizzBuzz"
+      assert ML.fizz_buzz(7) == "None"
     end
   end
 end

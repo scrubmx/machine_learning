@@ -1,7 +1,10 @@
 # ML Guides
 
-The guides are a collection of [Livebooks](https://livebook.dev) designed to help you learn the fundamental concepts of machine learning.
+These [Livebook](https://livebook.dev) guides walk through the examples in this
+repository. Start Livebook from the repository root so the notebooks can load
+the local source files.
 
 ## Classification
 
-* [FizzBuzz](notebooks/classifiers/fizz_buzz.livemd)
+* [FizzBuzz classifier](classifiers/fizz_buzz.livemd) — inspect the trained
+  weights, class probabilities, and cross-entropy loss.
